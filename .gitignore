@@ -60,6 +60,9 @@ chroma_db/
 *.chromadb/
 embeddings_cache/
 
+# External repos (cloned for docs ingest, regeneratable)
+external/
+
 # Model checkpoints / large data
 *.pt
 *.pth
