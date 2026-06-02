@@ -62,5 +62,19 @@ def ingest():
     ingest_main()
 
 
+@main.command()
+@click.option("--port", type=int, default=8501, help="Port for Streamlit server (default 8501).")
+def ui(port):
+    """Launch the Streamlit chat UI in your browser."""
+    import subprocess
+    import sys as _sys
+    from pathlib import Path as _Path
+    app_path = _Path(__file__).parent / "app.py"
+    cmd = [_sys.executable, "-m", "streamlit", "run", str(app_path),
+           "--server.port", str(port), "--server.headless", "false"]
+    click.echo(f"Launching mi-copilot UI on http://localhost:{port}")
+    subprocess.run(cmd)
+
+
 if __name__ == "__main__":
     main()

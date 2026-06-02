@@ -31,6 +31,8 @@ dependencies = [
     "chromadb>=0.4",
     "sentence-transformers>=2.2",
     "pypdf>=4.0",
+    # Web UI
+    "streamlit>=1.40",
     # Utility
     "python-dotenv>=1.0",
     "click>=8.1",

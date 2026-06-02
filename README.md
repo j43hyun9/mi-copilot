@@ -61,8 +61,14 @@ mi_copilot/
 ```bash
 pip install -e .
 cp .env.example .env  # then add your OPENAI_API_KEY
-mi-copilot ingest      # build local vector store (one-time)
+mi-copilot ingest      # build local vector store (one-time, ~2 min)
+
+# CLI
 mi-copilot ask "Nanda 2023 의 modular addition 회로 분석을 어떻게 재현하나요?"
+mi-copilot search "GCD sieve algorithm" -k 3   # retrieval only, no LLM
+
+# Web UI (Streamlit)
+mi-copilot ui          # opens http://localhost:8501
 ```
 
 ## Status

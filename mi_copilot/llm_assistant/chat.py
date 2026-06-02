@@ -59,6 +59,40 @@ User question:
 Answer using ONLY the retrieved context. Cite sources by name (paper / file)."""
 
 
+def answer_stream(query: str, k: int = 6, source_filter: str | None = None):
+    """Retrieve context and stream answer tokens (generator-style).
+
+    Returns:
+        (hits, token_generator) — hits is list[RetrievalHit] for the UI to
+        show as sources; token_generator yields str chunks for st.write_stream.
+    """
+    if not OPENAI_API_KEY:
+        raise RuntimeError("OPENAI_API_KEY not set. Add it to .env.")
+
+    from openai import OpenAI
+    client = OpenAI(api_key=OPENAI_API_KEY)
+
+    hits = retrieve(query, k=k, source_filter=source_filter)
+    user_msg = build_user_message(query, hits)
+
+    def token_gen():
+        resp = client.chat.completions.create(
+            model=OPENAI_MODEL,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": user_msg},
+            ],
+            max_tokens=2048,
+            stream=True,
+        )
+        for chunk in resp:
+            delta = chunk.choices[0].delta.content if chunk.choices else None
+            if delta:
+                yield delta
+
+    return hits, token_gen()
+
+
 def answer(query: str, k: int = 6, source_filter: str | None = None,
            stream: bool = True) -> str:
     """Retrieve context and synthesize an answer via OpenAI.
