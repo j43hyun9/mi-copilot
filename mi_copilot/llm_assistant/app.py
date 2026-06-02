@@ -11,8 +11,8 @@ from __future__ import annotations
 import streamlit as st
 from dotenv import load_dotenv
 
-from .chat import answer_stream
-from .retrieve import retrieve
+from mi_copilot.llm_assistant.chat import answer_stream
+from mi_copilot.llm_assistant.retrieve import retrieve
 
 load_dotenv()
 
