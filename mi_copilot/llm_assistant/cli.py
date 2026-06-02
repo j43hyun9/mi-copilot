@@ -76,5 +76,81 @@ def ui(port):
     subprocess.run(cmd)
 
 
+@main.command()
+@click.option("-n", "--samples", type=int, default=2,
+              help="Number of sample chunks to show per source (default 2).")
+@click.option("-s", "--source",
+              type=click.Choice(["transformerlens", "papers", "mi_copilot_repo"]),
+              default=None, help="Show only one source's stats + samples.")
+def inspect(samples, source):
+    """Browse the ChromaDB vector store contents (stats + sample chunks)."""
+    from collections import Counter
+    import chromadb
+    from .ingest import CHROMA_DB_PATH, COLLECTION_NAME
+
+    client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
+    coll = client.get_collection(COLLECTION_NAME)
+    total = coll.count()
+    data = coll.get(include=["metadatas"])
+
+    src_counter = Counter(m["source"] for m in data["metadatas"])
+    file_counter = Counter(m["file"] for m in data["metadatas"])
+
+    click.echo(click.style(f"\n[ChromaDB: {COLLECTION_NAME}]  total {total} chunks\n",
+                            fg="cyan", bold=True))
+
+    # Source-level distribution
+    click.echo("source 별 분포:")
+    for src, n in sorted(src_counter.items(), key=lambda x: -x[1]):
+        if source and src != source:
+            continue
+        bar = "█" * int(n / total * 50)
+        click.echo(f"  {src:20s}  {n:4d}  {bar}")
+
+    # File-level distribution (top 10 of the chosen source, or top 15 overall)
+    click.echo("\n파일 별 분포 (top 15):")
+    items = file_counter.most_common()
+    if source:
+        items = [(f, n) for f, n in items
+                 if any(m["file"] == f and m["source"] == source for m in data["metadatas"])][:15]
+    else:
+        items = items[:15]
+    for f, n in items:
+        short = f if len(f) <= 60 else "..." + f[-57:]
+        click.echo(f"  {n:4d}  {short}")
+
+    # Sample chunks
+    click.echo(click.style(f"\n샘플 chunks ({samples}/source):\n", fg="cyan", bold=True))
+    seen_per_source: Counter = Counter()
+    for id_, meta in zip(data["ids"], data["metadatas"]):
+        src = meta["source"]
+        if source and src != source:
+            continue
+        if seen_per_source[src] >= samples:
+            continue
+        seen_per_source[src] += 1
+        chunk_obj = coll.get(ids=[id_], include=["documents", "metadatas"])
+        doc = chunk_obj["documents"][0]
+        click.echo(click.style(
+            f"─── [{src}]  {meta['file']}  chunk #{meta['chunk_idx']}  ({id_}) ───",
+            fg="yellow",
+        ))
+        preview = doc[:500].rstrip()
+        click.echo(preview)
+        if len(doc) > 500:
+            click.echo(click.style(f"  ...(전체 {len(doc)} chars 중 처음 500자)", dim=True))
+        click.echo()
+
+    # Embedding info
+    if data["ids"]:
+        sample = coll.get(ids=[data["ids"][0]], include=["embeddings"])
+        emb = sample["embeddings"][0]
+        norm = sum(v * v for v in emb) ** 0.5
+        click.echo(click.style("임베딩 정보:", fg="cyan", bold=True))
+        click.echo(f"  차원:      {len(emb)}")
+        click.echo(f"  L2 norm:   {norm:.4f}  (1.0 에 가까우면 normalized)")
+        click.echo(f"  첫 5 값:   {[round(float(v), 4) for v in emb[:5]]}")
+
+
 if __name__ == "__main__":
     main()
