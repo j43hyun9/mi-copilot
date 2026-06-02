@@ -1,0 +1,60 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mi-copilot"
+version = "0.1.0"
+description = "RAG-based LLM assistant for Mechanistic Interpretability — guides users through MI paper reproduction via natural language."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Jaehyung Jeon", email = "j43hyun9@gmail.com" },
+]
+keywords = ["mechanistic-interpretability", "rag", "llm", "transformer", "grokking", "circuits"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    # Core
+    "numpy>=1.24",
+    "torch>=2.0",
+    "matplotlib>=3.7",
+    # RAG / LLM
+    "anthropic>=0.40",
+    "chromadb>=0.4",
+    "sentence-transformers>=2.2",
+    "pypdf>=4.0",
+    # Utility
+    "python-dotenv>=1.0",
+    "click>=8.1",
+    "rich>=13.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "ruff>=0.1",
+    "ipykernel>=6.25",
+]
+
+[project.scripts]
+mi-copilot = "mi_copilot.llm_assistant.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/j43hyun9/mi-copilot"
+Repository = "https://github.com/j43hyun9/mi-copilot"
+Issues = "https://github.com/j43hyun9/mi-copilot/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["mi_copilot"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
