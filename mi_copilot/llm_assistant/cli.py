@@ -2,7 +2,7 @@
 
 Commands:
     mi-copilot ingest         (re)build the local ChromaDB vector store
-    mi-copilot ask "..."      ask a question, Claude-synthesized answer
+    mi-copilot ask "..."      ask a question, OpenAI-synthesized answer
     mi-copilot search "..."   inspect top retrieved chunks (no LLM call)
 """
 from __future__ import annotations

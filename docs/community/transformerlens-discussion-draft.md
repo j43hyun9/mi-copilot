@@ -26,7 +26,7 @@ I'm a CS undergraduate working on a capstone project, and the deliverable is som
 - **Foundational MI papers**: Nanda 2023 (grokking modular addition), Charton 2024 (GCD circuits), Friedman 2023 (Transformer Programs), Weiss 2021 (RASP)
 - Its own thin docs
 
-Queries are embedded with a multilingual model (so Korean/English mixed queries work — which matters for non-English MI learners), retrieved from a local ChromaDB, and answered by Claude with explicit "ground in the retrieved sources, cite which paper / file" instructions.
+Queries are embedded with a multilingual model (so Korean/English mixed queries work — which matters for non-English MI learners), retrieved from a local ChromaDB, and answered by OpenAI's GPT-4.1 with explicit "ground in the retrieved sources, cite which paper / file" instructions.
 
 The motivation: TransformerLens has become the de facto standard for MI research, but for newcomers the on-ramp is steep — 50k+ LOC, dense docs, hundreds of functions. The existing support channels (GitHub Issues, Slack) are great but human-bandwidth-bound. A natural-language entry point that's grounded in the same docs+papers feels like a useful complement, not a replacement.
 
@@ -67,7 +67,7 @@ Thanks for considering — I learned an enormous amount of MI by reading TL code
 
 ## Posting checklist
 
-- [ ] Wait until D-1 (after end-to-end Claude API test confirms assistant produces sensible output)
+- [ ] Wait until D-1 (after end-to-end OpenAI API test confirms assistant produces sensible output)
 - [ ] Verify the repo URL works publicly (rename done)
 - [ ] Push a clean tagged release `v0.1.0-capstone` so the linked repo state is stable
 - [ ] Add screenshot or short asciinema of the CLI working

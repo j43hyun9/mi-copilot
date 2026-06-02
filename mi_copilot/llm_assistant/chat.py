@@ -1,8 +1,7 @@
-"""Generate answers via Claude API using retrieved context."""
+"""Generate answers via OpenAI API using retrieved context."""
 from __future__ import annotations
 
 import os
-from typing import Iterator
 
 from dotenv import load_dotenv
 
@@ -10,8 +9,8 @@ from .retrieve import RetrievalHit, retrieve
 
 load_dotenv()
 
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
-ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-opus-4-7")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
 
 SYSTEM_PROMPT = """\
 You are mi-copilot, a domain-specific assistant for Mechanistic Interpretability (MI) research.
@@ -62,7 +61,7 @@ Answer using ONLY the retrieved context. Cite sources by name (paper / file)."""
 
 def answer(query: str, k: int = 6, source_filter: str | None = None,
            stream: bool = True) -> str:
-    """Retrieve context and synthesize an answer via Claude.
+    """Retrieve context and synthesize an answer via OpenAI.
 
     Args:
         query: natural-language question
@@ -73,35 +72,41 @@ def answer(query: str, k: int = 6, source_filter: str | None = None,
     Returns:
         full answer text
     """
-    if not ANTHROPIC_API_KEY:
+    if not OPENAI_API_KEY:
         raise RuntimeError(
-            "ANTHROPIC_API_KEY not set. Add it to .env in the project root."
+            "OPENAI_API_KEY not set. Add it to .env in the project root."
         )
 
-    from anthropic import Anthropic
-    client = Anthropic(api_key=ANTHROPIC_API_KEY)
+    from openai import OpenAI
+    client = OpenAI(api_key=OPENAI_API_KEY)
 
     hits = retrieve(query, k=k, source_filter=source_filter)
     user_msg = build_user_message(query, hits)
 
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": user_msg},
+    ]
+
     if stream:
-        full = []
-        with client.messages.stream(
-            model=ANTHROPIC_MODEL,
+        full: list[str] = []
+        resp = client.chat.completions.create(
+            model=OPENAI_MODEL,
+            messages=messages,
             max_tokens=2048,
-            system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": user_msg}],
-        ) as s:
-            for text in s.text_stream:
-                print(text, end="", flush=True)
-                full.append(text)
+            stream=True,
+        )
+        for chunk in resp:
+            delta = chunk.choices[0].delta.content if chunk.choices else None
+            if delta:
+                print(delta, end="", flush=True)
+                full.append(delta)
         print()
         return "".join(full)
     else:
-        resp = client.messages.create(
-            model=ANTHROPIC_MODEL,
+        resp = client.chat.completions.create(
+            model=OPENAI_MODEL,
+            messages=messages,
             max_tokens=2048,
-            system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": user_msg}],
         )
-        return resp.content[0].text
+        return resp.choices[0].message.content or ""

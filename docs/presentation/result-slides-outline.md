@@ -40,7 +40,7 @@ GitHub:   https://github.com/j43hyun9/mi-copilot   (public, MIT)
 설치:     pip install -e .
 사용:     mi-copilot ask "Nanda 2023 어떻게 재현해?"
 
-스택:     Claude API (claude-opus-4-7) + ChromaDB
+스택:     OpenAI API (GPT-4.1) + ChromaDB
           + multilingual-e5-small (다국어 임베딩)
 ```
 
@@ -60,7 +60,7 @@ GitHub:   https://github.com/j43hyun9/mi-copilot   (public, MIT)
                        └────────────┬─────────────────────┘
                                     │
                        ┌────────────▼─────────────────────┐
-                       │   컨텍스트 + 질의 → Claude API     │
+                       │   컨텍스트 + 질의 → OpenAI API     │
                        │   (system prompt: "ground in      │
                        │    sources, cite, KO/EN match")   │
                        └────────────┬─────────────────────┘

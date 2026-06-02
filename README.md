@@ -1,6 +1,6 @@
 # mi-copilot
 
-> **RAG-based LLM assistant for Mechanistic Interpretability** — guides users through MI paper reproduction by retrieving from existing tools (TransformerLens, paper repos) and synthesizing actionable answers via Claude.
+> **RAG-based LLM assistant for Mechanistic Interpretability** — guides users through MI paper reproduction by retrieving from existing tools (TransformerLens, paper repos) and synthesizing actionable answers via OpenAI (GPT-4.1).
 
 Capstone project (2026 Spring, 컴퓨터공학과). The first docs-RAG learning assistant for the mechanistic interpretability research field.
 
@@ -12,7 +12,7 @@ Capstone project (2026 Spring, 컴퓨터공학과). The first docs-RAG learning 
 - Foundational MI papers (Nanda 2023, Charton 2024, and more)
 - Companion docs in this repository
 
-and then guides users — from absolute beginners to MI researchers — on how to apply the existing tools to specific tasks via natural-language queries answered by Claude.
+and then guides users — from absolute beginners to MI researchers — on how to apply the existing tools to specific tasks via natural-language queries answered by OpenAI's GPT-4.1.
 
 ## Why
 
@@ -46,7 +46,7 @@ mi_copilot/
 ├── llm_assistant/       ← THE PRIMARY DELIVERABLE
 │   ├── ingest.py        ─ vectorize TransformerLens docs + papers + own docs → ChromaDB
 │   ├── retrieve.py      ─ semantic search over the vector store
-│   ├── chat.py          ─ Claude API + retrieved context → answer
+│   ├── chat.py          ─ OpenAI API + retrieved context → answer
 │   └── cli.py           ─ `mi-copilot ask "..."` command
 ├── common/              ← minimal training utilities (TransformerLens targets
 │   ├── models.py        ─ pre-trained LLMs, not small algorithmic-task models;
@@ -60,7 +60,7 @@ mi_copilot/
 
 ```bash
 pip install -e .
-cp .env.example .env  # then add your ANTHROPIC_API_KEY
+cp .env.example .env  # then add your OPENAI_API_KEY
 mi-copilot ingest      # build local vector store (one-time)
 mi-copilot ask "Nanda 2023 의 modular addition 회로 분석을 어떻게 재현하나요?"
 ```

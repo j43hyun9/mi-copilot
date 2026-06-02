@@ -9,7 +9,7 @@ Run:
     py -m mi_copilot.reproductions.persona_sessions
 
 Requires:
-    - ANTHROPIC_API_KEY set in .env
+    - OPENAI_API_KEY set in .env
     - Ingest run at least once (`mi-copilot ingest`)
 """
 from __future__ import annotations
